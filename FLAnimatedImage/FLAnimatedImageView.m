@@ -267,7 +267,19 @@
     }
 
     // Reverse to scale to get the value back into seconds.
-    return scaledGCD / kGreatestCommonDivisorPrecision;
+    
+    // ATTENTION: Ugly and shameful hack due to
+    // Ticket #1128 Gif playback broken.
+    // Newly converted GIFs have a frame for every 3 seconds and the logic below does not work.
+    // Old GIFs on SS have scaledGCD of 10 or more.
+    // New GIFs on SS have scaledGCD of 1.
+    // By multiplying the frameCMD to 10 on new GIFs we get a regular display rate.
+    NSTimeInterval frameCMD = scaledGCD / kGreatestCommonDivisorPrecision;
+    if (scaledGCD <= 1) {
+        // New encoding of GIFs.
+        frameCMD = frameCMD * 10;
+    }
+    return frameCMD;
 }
 
 
